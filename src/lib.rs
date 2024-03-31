@@ -16,9 +16,9 @@ impl IFCDate {
 
         if month == June && Self::is_leap_year(year) && !(1..=29).contains(&day) {
             panic!("invalid day");
-        } else if month == December && !(1..29).contains(&day) {
+        } else if month == December && !(1..=29).contains(&day) {
             panic!("invalid day")
-        } else if !(1..29).contains(&day) {
+        } else if !(1..=29).contains(&day) {
             panic!("invalid day")
         }
 
@@ -34,7 +34,29 @@ impl IFCDate {
 
     /// Increment this date by one day.
     pub fn increment_day(&self) -> Self {
-        unimplemented!()
+        let mut new_date = *self;
+
+        if self.day < 28 {
+            new_date.day += 1;
+        } else if self.day == 28 && self.month == June && Self::is_leap_year(self.year) {
+            new_date.day += 1;
+        } else if self.day == 28 && self.month == December {
+            new_date.day += 1;
+        } else if self.day == 29 && self.month == June && Self::is_leap_year(self.year) {
+            new_date.day = 1;
+            new_date.month = Sol;
+        } else if self.day == 29 && self.month == December {
+            new_date.day = 1;
+            new_date.month = January;
+            new_date.year += 1;
+        } else if self.day == 28 {
+            new_date.day = 1;
+            new_date.month = Month::from_number(self.month.to_number() + 1);
+        }
+
+        new_date.week_day = WeekDay::from_day_and_month(new_date.day, new_date.month);
+
+        new_date
     }
 
     fn is_leap_year(year: usize) -> bool {
@@ -84,6 +106,24 @@ impl Month {
             12 => November,
             13 => December,
             _ => panic!("invalid number {num}")
+        }
+    }
+
+    fn to_number(&self) -> usize {
+        match self {
+            January => 1,
+            February => 2,
+            March => 3,
+            April => 4,
+            May => 5,
+            June => 6,
+            Sol => 7,
+            July => 8,
+            August => 9,
+            September => 10,
+            October => 11,
+            November => 12,
+            December => 13
         }
     }
 }
@@ -141,9 +181,14 @@ mod tests {
     #[test]
     fn increment_day_works() {
         let dates_expected = [
-            (IFCDate::new(12, 2, 2000), IFCDate::new(13, 2, 2000))
+            (IFCDate::new(12, 2, 2000), IFCDate::new(13, 2, 2000)),
+            (IFCDate::new(28, 2, 2000), IFCDate::new(1, 3, 2000)),
+            (IFCDate::new(28, 6, 2000), IFCDate::new(29, 6, 2000)), // 2000 is a leap year, so it has a leap day in june
+            (IFCDate::new(29, 6, 2000), IFCDate::new(1, 7, 2000)), // after the leap day follows the first of july
+            (IFCDate::new(28, 13, 2000), IFCDate::new(29, 13, 2000)), // after the last day of december follows the year day
+            (IFCDate::new(29, 13, 2000), IFCDate::new(1, 1, 2001)), // after year day follows the first day of the new year
         ];
 
-        dates_expected.into_iter().for_each(|(date, expected)| assert_eq!(date.increment_day(), expected))
+        dates_expected.into_iter().for_each(|(date, expected)| assert_eq!(date.increment_day(), expected, "{:?} incremented by one day was not {:?}", date, expected))
     }
 }
