@@ -5,7 +5,6 @@ use crate::WeekDay::{Friday, LeapDay, Monday, Saturday, Sunday, Thursday, Tuesda
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct IFCDate {
     day: usize,
-    week_day: WeekDay,
     month: Month,
     year: usize,
 }
@@ -22,11 +21,8 @@ impl IFCDate {
             panic!("invalid day")
         }
 
-        let week_day = WeekDay::from_day_and_month(day, month);
-
         IFCDate {
             day,
-            week_day,
             month,
             year,
         }
@@ -51,10 +47,8 @@ impl IFCDate {
             new_date.year += 1;
         } else if self.day == 28 {
             new_date.day = 1;
-            new_date.month = Month::from_number(self.month.to_number() + 1);
+            new_date.month = Month::from_number(self.month.number() + 1);
         }
-
-        new_date.week_day = WeekDay::from_day_and_month(new_date.day, new_date.month);
 
         new_date
     }
@@ -69,6 +63,22 @@ impl IFCDate {
         } else {
             false
         }
+    }
+
+    pub fn day(&self) -> usize {
+        self.day
+    }
+
+    pub fn week_day(&self) -> WeekDay {
+        WeekDay::from_day_and_month(self.day, self.month)
+    }
+
+    pub fn month(&self) -> usize {
+        self.month.number()
+    }
+
+    pub fn year(&self) -> usize {
+        self.year
     }
 }
 
@@ -110,7 +120,7 @@ impl Month {
         }
     }
 
-    fn to_number(&self) -> usize {
+    fn number(&self) -> usize {
         match self {
             January => 1,
             February => 2,
