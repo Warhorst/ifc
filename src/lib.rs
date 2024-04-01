@@ -2,12 +2,12 @@ use crate::Month::{April, August, December, February, January, July, June, March
 use crate::WeekDay::{Friday, LeapDay, Monday, Saturday, Sunday, Thursday, Tuesday, Wednesday, YearDay};
 
 /// Represents an International Fixed Calendar date. The date is monday based, so the first of each month is always monday.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct IFCDate {
-    pub day: usize,
-    pub week_day: WeekDay,
-    pub month: Month,
-    pub year: usize,
+    day: usize,
+    week_day: WeekDay,
+    month: Month,
+    year: usize,
 }
 
 impl IFCDate {
@@ -72,8 +72,9 @@ impl IFCDate {
     }
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub enum Month {
+    #[default]
     January,
     February,
     March,
@@ -128,8 +129,9 @@ impl Month {
     }
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub enum WeekDay {
+    #[default]
     Monday,
     Tuesday,
     Wednesday,
